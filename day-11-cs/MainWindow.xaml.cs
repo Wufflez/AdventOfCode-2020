@@ -18,29 +18,32 @@ namespace day_11_cs
             InitializeComponent();
         }
 
-        private WriteableBitmap _outputBitmap = null;
-        private async void Part1_Clicked(object sender, RoutedEventArgs e)
+        private WriteableBitmap _outputBitmap;
+
+        private void DisableButtons()
         {
-            // Disable buttons.
             Part1Button.IsEnabled = false;
             Part2Button.IsEnabled = false;
+        }
 
-            await Simulate(1);
-
+        private void EnableButtons()
+        {
             Part1Button.IsEnabled = true;
             Part2Button.IsEnabled = true;
         }
 
+        private async void Part1_Clicked(object sender, RoutedEventArgs e)
+        {
+            DisableButtons();
+            await Simulate(1);
+            EnableButtons();
+        }
+
         private async void Part2_Clicked(object sender, RoutedEventArgs e)
         {
-            // Disable buttons.
-            Part1Button.IsEnabled = false;
-            Part2Button.IsEnabled = false;
-
+            DisableButtons();
             await Simulate(2);
-
-            Part1Button.IsEnabled = true;
-            Part2Button.IsEnabled = true;
+            EnableButtons();
         }
 
         private async Task Simulate(int part)
@@ -50,19 +53,14 @@ namespace day_11_cs
 
             Cell[,] next = (Cell[,]) current.Clone();
 
-            _outputBitmap = new WriteableBitmap(current.GetLength(0), current.GetLength(1), 96, 96, PixelFormats.Bgra32,
-                null);
-
             RenderMap(current);
-
-            FerryImage.Source = _outputBitmap;
 
             bool stable = false;
             int stepCount = 0;
             int occupiedCount = 0;
             while (!stable)
             {
-                await Task.Delay(100);
+                await Task.Delay(50);
                 stable = Step(current, next, part);
                 stepCount++;
                 RenderMap(next);
@@ -72,16 +70,6 @@ namespace day_11_cs
             }
 
             StatusText.Text = $"DONE! {stepCount} steps, total occupied = {occupiedCount}";
-        }
-
-        private Cell GetCell(Cell[,] map, int x, int y)
-        {
-            int width = map.GetLength(0);
-            int height = map.GetLength(1);
-
-            if (x < 0 || x >= width) return Cell.Floor;
-            if (y < 0 || y >= height) return Cell.Floor;
-            return map[x, y];
         }
 
         private int CountCells(Cell[,] map, Cell cell)
@@ -96,27 +84,6 @@ namespace day_11_cs
             return count;
         }
 
-        private int CountAdjOccupied(Cell[,] map, int x, int y)
-        {
-            int emptyCount = 0;
-            
-            // Top row
-            if (GetCell(map, x - 1, y - 1) == Cell.OccupiedChair) emptyCount++;
-            if (GetCell(map, x , y - 1) == Cell.OccupiedChair) emptyCount++;
-            if (GetCell(map, x + 1, y - 1) == Cell.OccupiedChair) emptyCount++;
-
-            // Middle row
-            if (GetCell(map, x - 1, y ) == Cell.OccupiedChair) emptyCount++;
-            if (GetCell(map, x + 1, y ) == Cell.OccupiedChair) emptyCount++;
-
-            // Bottom row
-            if (GetCell(map, x - 1, y + 1) == Cell.OccupiedChair) emptyCount++;
-            if (GetCell(map, x, y + 1) == Cell.OccupiedChair) emptyCount++;
-            if (GetCell(map, x + 1, y + 1) == Cell.OccupiedChair) emptyCount++;
-
-            return emptyCount;
-        }
-
         private static readonly (int x, int y)[] Directions =
         {
             (-1, -1), (0, -1), (1, -1),
@@ -124,10 +91,10 @@ namespace day_11_cs
             (-1, 1),  (0, 1),  (1, 1),
         };
 
-        private int CountVisibleOccupied(Cell[,] map, int x, int y) => 
-            Directions.Count(dir => OccupiedSeenFrom(map, x, y, dir.x, dir.y));
+        private int CountOccupied(Cell[,] map, int x, int y, bool onlyAdjacent) => 
+            Directions.Count(dir => CheckOccupiedInDir(map, x, y, dir.x, dir.y, onlyAdjacent));
 
-        private bool OccupiedSeenFrom(Cell[,] map, int x, int y, int dx, int dy)
+        private bool CheckOccupiedInDir(Cell[,] map, int x, int y, int dx, int dy, bool onlyAdjacent)
         {
             int width = map.GetLength(0);
             int height = map.GetLength(1);
@@ -139,6 +106,7 @@ namespace day_11_cs
                 if (map[x, y] == Cell.EmptyChair) return false;
                 x += dx;
                 y += dy;
+                if (onlyAdjacent) break;
             }
             return false;
         }
@@ -154,8 +122,8 @@ namespace day_11_cs
                 {
                     var (occupiedAround, maxOccupied) = part switch
                     {
-                        1 => (CountAdjOccupied(current, x, y), 4),
-                        2 => (CountVisibleOccupied(current, x, y), 5),
+                        1 => (CountOccupied(current, x, y, true), 4),
+                        2 => (CountOccupied(current, x, y, false), 5),
                         _ => throw new InvalidOperationException("There are ony 2 parts!"),
                     };
 
@@ -163,7 +131,7 @@ namespace day_11_cs
                     {
                         Cell.EmptyChair when occupiedAround == 0 => Cell.OccupiedChair,
                         Cell.OccupiedChair when occupiedAround >= maxOccupied => Cell.EmptyChair,
-                        Cell anyOther => anyOther,
+                        { } anyOther => anyOther,
                     };
 
                     if (newState != current[x, y]) stable = false;
@@ -176,6 +144,11 @@ namespace day_11_cs
 
         private void RenderMap(Cell[,] map)
         {
+            _outputBitmap ??= new WriteableBitmap(map.GetLength(0), map.GetLength(1), 96, 96, PixelFormats.Bgra32,
+                null);
+
+            FerryImage.Source ??= _outputBitmap;
+
             _outputBitmap.Lock();
             try
             {
@@ -220,6 +193,7 @@ namespace day_11_cs
             '.' => Cell.Floor,
             'L' => Cell.EmptyChair,
             '#' => Cell.OccupiedChair,
+            _ => throw new ArgumentException("Invalid character"),
         };
 
         private async Task<Cell[,]> LoadMapData(string filePath)
@@ -234,6 +208,12 @@ namespace day_11_cs
                 mapData[x, y] = CellFromChar(lines[y][x]);
             return mapData;
         }
-        
+
+        private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            // Display initial map.
+            var initialMap = await LoadMapData("input.txt");
+            RenderMap(initialMap);
+        }
     }
 }

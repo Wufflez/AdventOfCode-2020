@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:day_11_cs"
         mc:Ignorable="d"
         Title="Day 11" Width="800" Height="800" Icon="Resources/santa.ico"
+        Loaded="MainWindow_OnLoaded"
         WindowStartupLocation="CenterScreen" Background="White" UseLayoutRounding="True">
     <Window.Resources>
         <Style TargetType="Button" x:Key="FlatButtonStyle">
@@ -60,7 +61,7 @@
                 <Border Margin="2" HorizontalAlignment="Left" Background="#6000" 
                          Padding="4" CornerRadius="4"
                          Grid.Column="2" VerticalAlignment="Center">
-                    <TextBlock x:Name="StatusText" FontSize="24" FontFamily="Consolas" Foreground="#333">STATUS</TextBlock>
+                    <TextBlock x:Name="StatusText" FontSize="24" FontFamily="Consolas" Foreground="#333">Click a part to simulate</TextBlock>
                 </Border>
                 <Button x:Name="Part1Button" Margin="2" Grid.Column="0" BorderThickness="0" Click="Part1_Clicked"
                         FontSize="24" Foreground="#333" Style="{StaticResource FlatButtonStyle}">
@@ -74,8 +75,12 @@
         </Border>
 
         <Border
-            BorderThickness="2" BorderBrush="DodgerBlue" Margin="20" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Image x:Name="FerryImage" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+            BorderThickness="4" BorderBrush="OrangeRed" Margin="20" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="16" Direction="0" ShadowDepth="0" Color="OrangeRed" Opacity="1"/>
+            </Border.Effect>
+            <Image x:Name="FerryImage" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                
         </Border>
 
     </DockPanel>

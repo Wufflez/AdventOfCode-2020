@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>day_11_cs</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\santa.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="santa.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\santa.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="input.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

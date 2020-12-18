@@ -1,0 +1,82 @@
+﻿<Window x:Class="day_11_cs.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:day_11_cs"
+        mc:Ignorable="d"
+        Title="Day 11" Width="800" Height="800" Icon="Resources/santa.ico"
+        WindowStartupLocation="CenterScreen" Background="White" UseLayoutRounding="True">
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="FlatButtonStyle">
+            <Setter Property="Background" Value="Green"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Width" Value="75"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border BorderThickness="0"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF5BB75B" Offset="0" />
+                                <GradientStop Color="#FF398239" Offset="1" />
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Cursor" Value="Hand" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#B75B5B" Offset="0" />
+                                <GradientStop Color="#823939" Offset="1" />
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <DockPanel>
+        <Border DockPanel.Dock="Bottom" Background="LightGreen">
+            <Grid Margin="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Margin="2" HorizontalAlignment="Left" Background="#6000" 
+                         Padding="4" CornerRadius="4"
+                         Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock x:Name="StatusText" FontSize="24" FontFamily="Consolas" Foreground="#333">STATUS</TextBlock>
+                </Border>
+                <Button x:Name="Part1Button" Margin="2" Grid.Column="0" BorderThickness="0" Click="Part1_Clicked"
+                        FontSize="24" Foreground="#333" Style="{StaticResource FlatButtonStyle}">
+                    Part 1
+                </Button>
+                <Button x:Name="Part2Button" Margin="2" Grid.Column="1" BorderThickness="0" Click="Part2_Clicked"
+                        FontSize="24" Foreground="#333" Style="{StaticResource FlatButtonStyle}">
+                    Part 2
+                </Button>
+            </Grid>
+        </Border>
+
+        <Border
+            BorderThickness="2" BorderBrush="DodgerBlue" Margin="20" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Image x:Name="FerryImage" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+        </Border>
+
+    </DockPanel>
+</Window>

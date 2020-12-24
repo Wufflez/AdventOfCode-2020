@@ -1,5 +1,4 @@
-﻿//let input = System.IO.File.ReadAllLines "input.txt"
-let input = [|"939";"7,13,x,x,59,x,31,19"|]
+﻿let input = System.IO.File.ReadAllLines "input.txt"
 
 let timestamp = input.[0] |> int
 let busses = input.[1].Split "," |> Seq.filter ((<>) "x") |> Seq.map int |> Seq.toList
@@ -13,13 +12,17 @@ printfn "Part 1 = %i" (bus * timeToWait)
 
 let bussesIndexed = input.[1].Split "," |> Array.indexed |> Seq.filter (fun (_,t) -> t <> "x") 
                                         |> Seq.map (fun (pos, bus) -> (pos, int64 bus))
-                                        |> Seq.sortByDescending (fun (_, bus)->bus) |> Seq.toArray
+                                        |> Seq.toArray
 
-let (bigPos, biggestBus) = bussesIndexed |> Array.head
+let mutable _, value = bussesIndexed |> Array.head
+let mutable increment = value;
 
-let biggestBusTimestamp = Seq.initInfinite (fun n -> (int64)n * biggestBus) 
-                            |> Seq.find (fun ts -> bussesIndexed |> Seq.forall( fun (pos, bus) -> (ts - (int64)bigPos + (int64)pos) % (int64)bus = 0L))
+for i, bus in bussesIndexed |> Array.skip 1 do
+    let m = (-(int64)i % bus + bus) % bus;
+    printfn "m = %i" m
+    while (value % bus) <> m do
+        value <- value + increment;
+    increment <- increment * bus
 
-printfn "Part 2 = %i" (biggestBusTimestamp - (int64)bigPos)
-
-// TODO:  Do this using that Chinese remainder theorum apparently is the way you're supposed to do this.
+printfn "Part 2: %i" value
+  
